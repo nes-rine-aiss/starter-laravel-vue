@@ -33,8 +33,5 @@ class UpdateUserRequest extends FormRequest
         ];
     }
 
-    public function getUserData(): UserData
-    {
-        return UserData::from($this);
-    }
+
 }

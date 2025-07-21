@@ -29,14 +29,13 @@ class StoreUserRequest extends FormRequest
             'firstname' => ['required', 'string', 'max:255'],
             'lastname' => ['required', 'string', 'max:255'],
             'login' => ['required', 'string', 'max:255','unique:users'],
+            'roles' => ['required', 'array'],
+            'roles.*' => ['string', 'exists:roles,name'],
 
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }
 
-    public function getUserData(): UserData
-    {
-        return UserData::from($this);
-    }
+
 }

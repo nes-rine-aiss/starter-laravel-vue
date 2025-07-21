@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GoodController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -23,5 +24,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+
+
+
+
+Route::get("/goods/create",[GoodController::class,'create'])->name('good.create');
+Route::post("/goods/show/{good}",[GoodController::class,'show'])->name('good.show');
+
+Route::delete("/goods",[GoodController::class,'destroy'])->name('good.destroy');
+
+Route::get("/goods",[GoodController::class,'index'])->name('good.index');
+Route::get("/goods/edit/{good}",[GoodController::class,'edit'])->name('good.edit');
+
 
 require __DIR__.'/auth.php';

@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import GoodCard from '@/Components/GoodCard.vue'
 
 defineProps({
     canLogin: Boolean,
@@ -38,7 +39,14 @@ defineProps({
                 >
             </div>
         </div>
+ 
 
+
+
+        <div>
+
+          <GoodCard/>
+        </div>
       
     </div>
 </template>

@@ -36,7 +36,7 @@ class UserController extends Controller
         $users = (new User)->newQuery();
 
         if (request()->has('search')) {
-            $users->where('firstname', 'Like', '%'.request()->input('search').'%');
+            $users->where('firstname', 'Like', '%' . request()->input('search') . '%');
         }
 
         if (request()->query('sort')) {
@@ -52,8 +52,8 @@ class UserController extends Controller
         }
 
         $users = $users->paginate(config('admin.paginate.per_page'))
-                    ->onEachSide(config('admin.paginate.each_side'))
-                    ->appends(request()->query());
+            ->onEachSide(config('admin.paginate.each_side'))
+            ->appends(request()->query());
 
         return Inertia::render('Admin/User/Index', [
             'users' => $users,
@@ -85,9 +85,18 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(StoreUserRequest $request, CreateUser $createUser)
+    public function store(StoreUserRequest $request,)
     {
-        $createUser->handle($request->getUserData());
+        $user = User::create([
+            'firstname' => $request['firstname'],
+            'lastname' => $request['lastname'],
+            'login' => $request['login'],
+            'email' => $request['email'],
+            'password' => Hash::make($request['password']),
+        ]);
+
+        $roles = $request['roles'] ?? [];
+        $user->assignRole($roles);
 
         return redirect()->route('admin.user.index')
             ->with('message', __('Utilisateur a été crée avec succès.'));
@@ -169,17 +178,16 @@ class UserController extends Controller
     public function updatePassword(UpdatePasswordRequest $request, User $user)
     {
 
-      $rules = array_merge($request->rules());
-      $request->validate($rules);
-      if ($request->password) {
-        $user->update([
-            'password' => Hash::make($request->password),
-        ]);
-    }
+        $rules = array_merge($request->rules());
+        $request->validate($rules);
+        if ($request->password) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
 
-    $message = 'Account updated successfully.';
-    return redirect()->route('admin.user.edit',$user->id)->with('message', __($message));
-
+        $message = 'Account updated successfully.';
+        return redirect()->route('admin.user.edit', $user->id)->with('message', __($message));
     }
     /**
      * Save the modified personal information for a user.
@@ -191,9 +199,9 @@ class UserController extends Controller
         $request->validate([
             'firstname' => ['required', 'string', 'max:255'],
             'lastname' => ['required', 'string', 'max:255'],
-            'login' => ['required', 'string', 'max:255', 'unique:users,login,'.\Auth::user()->id],
+            'login' => ['required', 'string', 'max:255', 'unique:users,login,' . \Auth::user()->id],
 
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.\Auth::user()->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . \Auth::user()->id],
         ]);
 
         $user = \Auth::user()->update($request->except(['_token']));
@@ -226,7 +234,8 @@ class UserController extends Controller
             }
             if (! Hash::check($request->input('old_password'), \Auth::user()->password)) {
                 $validator->errors()->add(
-                    'old_password', __('Old password is incorrect.')
+                    'old_password',
+                    __('Old password is incorrect.')
                 );
             }
         });
@@ -247,10 +256,9 @@ class UserController extends Controller
     }
     public function changeStatus(User $user)
     {
-        if($user->active == 1) {
+        if ($user->active == 1) {
             $user->active = 0;
-    
-        }else {
+        } else {
             $user->active = 1;
         }
         $user->save();
